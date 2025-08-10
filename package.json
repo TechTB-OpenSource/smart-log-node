@@ -1,0 +1,50 @@
+{
+  "name": "smart-log-node",
+  "version": "1.0.0",
+  "description": "A simple logging utility that makes simultaneous console and database logging easy.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "dev": "tsc --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TechTB-OpenSource/smart-log-node.git"
+  },
+  "keywords": [
+    "logging",
+    "database",
+    "console",
+    "typescript",
+    "javascript",
+    "node"
+  ],
+  "author": "TechTB LLC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TechTB-OpenSource/smart-log-node/issues"
+  },
+  "homepage": "https://github.com/TechTB-OpenSource/smart-log-node#readme",
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "rimraf": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
