@@ -2,8 +2,11 @@ import { ColorMap, ConsoleLogDefinition } from "./_models";
 
 export const defaultSettings = {
     consoleLoggingEnabled: true,
-    consoleDateTimeEnabled: true
+    consoleDateTimeEnabled: true,
+    debugLogsEnabled: false
 };
+
+export const defaultLogLevelDebugName: string = 'debug';
 
 export const defaultLogLevels: string[] = [
     'info',
@@ -25,6 +28,10 @@ export const defaultConsoleColors: ColorMap = {
 };
 
 export const defaultConsoleDefinitions: ConsoleLogDefinition[] = [
+    {
+        level: "debug",
+        color: 'cyan'
+    },
     {
         level: "info",
         color: 'blue'
