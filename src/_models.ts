@@ -1,5 +1,6 @@
 export interface Settings {
     consoleLoggingEnabled: boolean;
+    consoleDateTimeEnabled: boolean;
 }
 
 export interface LogDefinition<T> {

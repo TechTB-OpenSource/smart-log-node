@@ -1,20 +1,24 @@
 import type { Settings, LogDefinition, LogCommonInput, LogConsoleInput, ColorMap, ConsoleLogDefinition } from './_models.js';
-import { defaultConsoleColors, defaultConsoleDefinitions, defaultLogLevels } from './_defaults.js';
+import {
+    defaultSettings,
+    defaultConsoleColors,
+    defaultConsoleDefinitions,
+    defaultLogLevels
+} from './_defaults.js';
 import _utils from './_utils.js';
 
-const { convertToString } = _utils;
+const { convertToString, formatDateTimeForConsole } = _utils;
 
 function createSmartLogInstance() {
     const definitions: LogDefinition<any>[] = [];
     const ConsoleLogDefinitions: ConsoleLogDefinition[] = defaultConsoleDefinitions;
     const logLevels: string[] = defaultLogLevels;
     const consoleColors: ColorMap = defaultConsoleColors;
-    const settings: Settings = {
-        consoleLoggingEnabled: false
-    };
+    const settings: Settings = defaultSettings;
 
     function setSettings(newSettings: Settings): void {
         settings.consoleLoggingEnabled = newSettings.consoleLoggingEnabled;
+        settings.consoleDateTimeEnabled = newSettings.consoleDateTimeEnabled;
     }
 
     function setLogLevels(levels: string[]): void {
@@ -30,7 +34,7 @@ function createSmartLogInstance() {
         definitions.push(definition);
     }
 
-    function log<T>(input: LogCommonInput<T>): void {
+    function smartLog<T>(input: LogCommonInput<T>): void {
         const level: string = input.level || '';
         const category: string = input.category || '';
         const content: T = input.content;
@@ -55,15 +59,17 @@ function createSmartLogInstance() {
                 def.insertFunction(input);
                 return;
             }
+            console.error(`${defaultConsoleColors.red}Smart Log Error: No definition found for category: ${category}${defaultConsoleColors.reset}`);
         }
     }
 
 
-    async function logAwait<T>(input: LogCommonInput<T>): Promise<void> {
+    async function smartLogAwait<T>(input: LogCommonInput<T>): Promise<void> {
         try {
             const level: string = input.level || '';
             const category: string = input.category || '';
             const content: T = input.content;
+            
             const messageKey: string | undefined = input.messageKey;
             let message: string;
             if (messageKey) {
@@ -72,6 +78,7 @@ function createSmartLogInstance() {
             } else {
                 message = convertToString(content);
             }
+
             if (settings.consoleLoggingEnabled) {
                 consoleLog({
                     level: level,
@@ -79,6 +86,7 @@ function createSmartLogInstance() {
                     message: message
                 } satisfies LogConsoleInput);
             }
+
             for (let i = 0; i < definitions.length; i++) {
                 const def = definitions[i];
                 if (def.category === category) {
@@ -86,16 +94,23 @@ function createSmartLogInstance() {
                     return;
                 }
             }
-        } catch (error) {
-            console.error(`${defaultConsoleColors.red}Error in logAsync: ${error}${defaultConsoleColors.reset}`);
+            throw new Error(`Smart Log Error: No definition found for category: ${category}`);
+        } catch (er) {
+            console.error(`${defaultConsoleColors.red}SMART LOG ERROR: ${er}${defaultConsoleColors.reset}`);
         }
     }
 
     function consoleLog(input: LogConsoleInput | string): void {
         if (typeof input === 'string') {
-            console.log(input);
+            console.log(`${defaultConsoleColors.cyan}${input}${defaultConsoleColors.reset}`);
             return;
         }
+
+        let dateTime: string = '';
+        if (settings.consoleDateTimeEnabled) {
+            dateTime = `${formatDateTimeForConsole()} - `;
+        }
+
         const level = input.level || 'default';
         const levelUpper = level.toUpperCase();
         const categoryUpper = input.category?.toUpperCase() || '';
@@ -113,11 +128,11 @@ function createSmartLogInstance() {
             const def = ConsoleLogDefinitions[i];
             if (def.level === level) {
                 const color = consoleColors[def.color || 'reset'] || consoleColors.reset;
-                console.log(`${color}${adjustedLevel}${adjustedCategory}${def.prefix || ''}${message}${def.suffix || ''}[0m`);
+                console.log(`${color}${adjustedLevel}${adjustedCategory}${dateTime}${def.prefix || ''}${message}${def.suffix || ''}${defaultConsoleColors.reset}`);
                 return;
             }
         }
-        console.log(`[0m${adjustedLevel}- ${message}`);
+        console.log(`${defaultConsoleColors.cyan}${adjustedLevel}${dateTime}${message}${defaultConsoleColors.reset}`);
     }
 
     return {
@@ -125,8 +140,8 @@ function createSmartLogInstance() {
         setLogLevels,
         setConsoleColors,
         addDefinition,
-        log,
-        logAwait,
+        smartLog,
+        smartLogAwait,
         consoleLog
     }
 }

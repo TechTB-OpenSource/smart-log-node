@@ -1,5 +1,10 @@
 import { ColorMap, ConsoleLogDefinition } from "./_models";
 
+export const defaultSettings = {
+    consoleLoggingEnabled: true,
+    consoleDateTimeEnabled: true
+};
+
 export const defaultLogLevels: string[] = [
     'info',
     'success',
