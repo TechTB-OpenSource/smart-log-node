@@ -71,11 +71,13 @@ function createSmartLogInstance() {
         }
         const category: string = input.category || '';
         const content: T = input.content;
-        const title: string | undefined = input.title;
+        const displayedContentKeys: string[] | undefined = input.displayedContentKeys;
         let message: string;
-        if (title) {
-            const messageValue = input.content[title as keyof T] || convertToString(content);
-            message = String(messageValue);
+        if (displayedContentKeys && displayedContentKeys.length > 0) {
+            const messageValues = displayedContentKeys.map(key =>
+                String(input.content[key as keyof T] || '')
+            ).filter(value => value !== '');
+            message = messageValues.length > 0 ? messageValues.join(' - ') : convertToString(content);
         } else {
             message = convertToString(content);
         }
@@ -105,15 +107,16 @@ function createSmartLogInstance() {
             }
             const category: string = input.category || '';
             const content: T = input.content;
-            const title: string | undefined = input.title;
+            const displayedContentKeys: string[] | undefined = input.displayedContentKeys;
             let message: string;
-            if (title) {
-                const messageValue = input.content[title as keyof T] || convertToString(content);
-                message = String(messageValue);
+            if (displayedContentKeys && displayedContentKeys.length > 0) {
+                const messageValues = displayedContentKeys.map(key =>
+                    String(input.content[key as keyof T] || '')
+                ).filter(value => value !== '');
+                message = messageValues.length > 0 ? messageValues.join(' - ') : convertToString(content);
             } else {
                 message = convertToString(content);
             }
-
             if (settings.consoleLoggingEnabled) {
                 consoleLog({
                     level: level,
