@@ -71,10 +71,10 @@ function createSmartLogInstance() {
         }
         const category: string = input.category || '';
         const content: T = input.content;
-        const messageKey: string | undefined = input.messageKey;
+        const title: string | undefined = input.title;
         let message: string;
-        if (messageKey) {
-            const messageValue = input.content[messageKey as keyof T] || convertToString(content);
+        if (title) {
+            const messageValue = input.content[title as keyof T] || convertToString(content);
             message = String(messageValue);
         } else {
             message = convertToString(content);
@@ -105,10 +105,10 @@ function createSmartLogInstance() {
             }
             const category: string = input.category || '';
             const content: T = input.content;
-            const messageKey: string | undefined = input.messageKey;
+            const title: string | undefined = input.title;
             let message: string;
-            if (messageKey) {
-                const messageValue = input.content[messageKey as keyof T] || convertToString(content);
+            if (title) {
+                const messageValue = input.content[title as keyof T] || convertToString(content);
                 message = String(messageValue);
             } else {
                 message = convertToString(content);

@@ -12,7 +12,7 @@ export interface LogDefinition<T> {
 export interface LogCommonInput<T> {
     level?: string;
     category?: string;
-    messageKey?: string;
+    title?: string;
     content: T;
 }
 
