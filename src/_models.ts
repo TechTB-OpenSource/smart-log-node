@@ -6,12 +6,12 @@ export interface SmartLogSettings {
     debugLogsEnabled: boolean;
 }
 
-export interface SmartLogDefinition<T> {
+export interface SmartLogDefinition<T extends object> {
     category: string;
     insertFunction: (input: SmartLogInput<T>) => Promise<void>;
 }
 
-export interface SmartLogInput<T> {
+export interface SmartLogInput<T extends object> {
     level?: string;
     category?: string;
     content: T;

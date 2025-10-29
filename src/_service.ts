@@ -60,11 +60,11 @@ function createSmartLogInstance() {
         Object.assign(consoleColors, colors);
     }
 
-    function addDefinition<T>(definition: SmartLogDefinition<T>): void {
+    function addDefinition<T extends object>(definition: SmartLogDefinition<T>): void {
         definitions.push(definition);
     }
 
-    function smartLog<T>(input: SmartLogInput<T>): void {
+    function smartLog<T extends object>(input: SmartLogInput<T>): void {
         const level: string = input.level || '';
         if (level === logLevelDebugName && !settings.debugLogsEnabled) {
             return;
@@ -99,7 +99,7 @@ function createSmartLogInstance() {
     }
 
 
-    async function smartLogAwait<T>(input: SmartLogInput<T>): Promise<void> {
+    async function smartLogAwait<T extends object>(input: SmartLogInput<T>): Promise<void> {
         try {
             const level: string = input.level || '';
             if (level === logLevelDebugName && !settings.debugLogsEnabled) {
