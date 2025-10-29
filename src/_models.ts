@@ -1,22 +1,24 @@
-export interface Settings {
+export type LogLevels = string[];
+
+export interface SmartLogSettings {
     consoleLoggingEnabled: boolean;
     consoleDateTimeEnabled: boolean;
     debugLogsEnabled: boolean;
 }
 
-export interface LogDefinition<T> {
+export interface SmartLogDefinition<T> {
     category: string;
-    insertFunction: (input: LogCommonInput<T>) => Promise<void>;
+    insertFunction: (input: SmartLogInput<T>) => Promise<void>;
 }
 
-export interface LogCommonInput<T> {
+export interface SmartLogInput<T> {
     level?: string;
     category?: string;
-    displayedContentKeys?: string[];
     content: T;
+    displayedContentKeys?: string[];
 }
 
-export interface LogConsoleInput {
+export interface ConsoleLogInput {
     level?: string;
     category?: string;
     message?: string;

@@ -1,8 +1,8 @@
-import type { Settings, LogDefinition, LogCommonInput, LogConsoleInput, ColorMap, ConsoleLogDefinition } from './_models.js';
+import type { SmartLogSettings, SmartLogDefinition, SmartLogInput, ConsoleLogInput, ColorMap, ConsoleLogDefinition } from './_models.js';
 import {
     defaultSettings,
     defaultConsoleColors,
-    defaultConsoleDefinitions,
+    defaultConsoleLogDefinitions,
     defaultLogLevels,
     defaultLogLevelDebugName
 } from './_defaults.js';
@@ -11,14 +11,14 @@ import _utils from './_utils.js';
 const { convertToString, formatDateTimeForConsole } = _utils;
 
 function createSmartLogInstance() {
-    const definitions: LogDefinition<any>[] = [];
-    const ConsoleLogDefinitions: ConsoleLogDefinition[] = defaultConsoleDefinitions;
+    const definitions: SmartLogDefinition<any>[] = [];
+    const consoleLogDefinitions: ConsoleLogDefinition[] = defaultConsoleLogDefinitions;
     const logLevels: string[] = defaultLogLevels;
     let logLevelDebugName: string = defaultLogLevelDebugName;
     const consoleColors: ColorMap = defaultConsoleColors;
-    const settings: Settings = defaultSettings;
+    const settings: SmartLogSettings = defaultSettings;
 
-    function setSettings(newSettings: Settings): void {
+    function setSettings(newSettings: SmartLogSettings): void {
         settings.consoleLoggingEnabled = newSettings.consoleLoggingEnabled;
         settings.consoleDateTimeEnabled = newSettings.consoleDateTimeEnabled;
         settings.debugLogsEnabled = newSettings.debugLogsEnabled;
@@ -60,11 +60,11 @@ function createSmartLogInstance() {
         Object.assign(consoleColors, colors);
     }
 
-    function addDefinition<T>(definition: LogDefinition<T>): void {
+    function addDefinition<T>(definition: SmartLogDefinition<T>): void {
         definitions.push(definition);
     }
 
-    function smartLog<T>(input: LogCommonInput<T>): void {
+    function smartLog<T>(input: SmartLogInput<T>): void {
         const level: string = input.level || '';
         if (level === logLevelDebugName && !settings.debugLogsEnabled) {
             return;
@@ -86,7 +86,7 @@ function createSmartLogInstance() {
                 level: level,
                 category: category,
                 message: message
-            } satisfies LogConsoleInput);
+            } satisfies ConsoleLogInput);
         }
         for (let i = 0; i < definitions.length; i++) {
             const def = definitions[i];
@@ -99,7 +99,7 @@ function createSmartLogInstance() {
     }
 
 
-    async function smartLogAwait<T>(input: LogCommonInput<T>): Promise<void> {
+    async function smartLogAwait<T>(input: SmartLogInput<T>): Promise<void> {
         try {
             const level: string = input.level || '';
             if (level === logLevelDebugName && !settings.debugLogsEnabled) {
@@ -122,7 +122,7 @@ function createSmartLogInstance() {
                     level: level,
                     category: category,
                     message: message
-                } satisfies LogConsoleInput);
+                } satisfies ConsoleLogInput);
             }
 
             for (let i = 0; i < definitions.length; i++) {
@@ -138,7 +138,7 @@ function createSmartLogInstance() {
         }
     }
 
-    function consoleLog(input: LogConsoleInput | string): void {
+    function consoleLog(input: ConsoleLogInput | string): void {
         if (typeof input === 'string') {
             console.log(`${defaultConsoleColors.cyan}${input}${defaultConsoleColors.reset}`);
             return;
@@ -165,8 +165,8 @@ function createSmartLogInstance() {
                 ? categoryUpper.substring(0, 9) + ' ' + '- '
                 : categoryUpper.padEnd(10, ' ') + '- ';
 
-        for (let i = 0; i < ConsoleLogDefinitions.length; i++) {
-            const def = ConsoleLogDefinitions[i];
+        for (let i = 0; i < consoleLogDefinitions.length; i++) {
+            const def = consoleLogDefinitions[i];
             if (def.level === level) {
                 const color = consoleColors[def.color || 'reset'] || consoleColors.reset;
                 console.log(`${color}${adjustedLevel}${adjustedCategory}${dateTime}${def.prefix || ''}${message}${def.suffix || ''}${defaultConsoleColors.reset}`);

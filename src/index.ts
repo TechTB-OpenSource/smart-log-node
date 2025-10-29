@@ -4,8 +4,11 @@ export const {
     createSmartLogInstance
 } = _service;
 
-export {
-    Settings,
-    LogDefinition,
-    LogCommonInput
+export type {
+    LogLevels,
+    SmartLogSettings,
+    SmartLogDefinition,
+    SmartLogInput,
+    ConsoleLogInput,
+    ConsoleLogDefinition
 } from './_models.js';
