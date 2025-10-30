@@ -1,9 +1,11 @@
 import { LogLevels, SmartLogSettings, ColorMap, ConsoleLogDefinition } from "./_models";
 
 export const defaultSettings: SmartLogSettings = {
+    debugLogsEnabled: false,
     consoleLoggingEnabled: true,
-    consoleDateTimeEnabled: true,
-    debugLogsEnabled: false
+    consoleLevelLength: 10,
+    consoleNameLength: 15,
+    consoleDateTimeEnabled: true
 };
 
 export const defaultLogLevelDebugName: string = 'debug';

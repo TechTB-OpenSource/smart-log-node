@@ -6,7 +6,7 @@ export const {
 
 export type {
     LogLevels,
-    SmartLogSettings,
+    SmartLogSettingsInput,
     SmartLogDefinition,
     SmartLogInput,
     ConsoleLogInput,

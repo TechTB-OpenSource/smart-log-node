@@ -1,26 +1,40 @@
 export type LogLevels = string[];
 
 export interface SmartLogSettings {
+    debugLogsEnabled: boolean;
     consoleLoggingEnabled: boolean;
     consoleDateTimeEnabled: boolean;
-    debugLogsEnabled: boolean;
+    consoleLevelLength: number;
+    consoleNameLength: number;
+}
+
+export interface SmartLogSettingsInput {
+    debugLogsEnabled?: boolean;
+    consoleLoggingEnabled?: boolean;
+    consoleDateTimeEnabled?: boolean;
+    consoleLevelLength?: number;
+    consoleNameLength?: number;
 }
 
 export interface SmartLogDefinition<T extends object> {
-    category: string;
+    definitionName: string;
     insertFunction: (input: SmartLogInput<T>) => Promise<void>;
 }
 
 export interface SmartLogInput<T extends object> {
+    definitionName: string;
     level?: string;
-    category?: string;
+    consoleEnabled?: boolean;
+    consoleDateTimeEnabled?: boolean;
+    consoleName?: string;
     content: T;
     displayedContentKeys?: string[];
 }
 
 export interface ConsoleLogInput {
     level?: string;
-    category?: string;
+    name?: string;
+    dateTimeEnabled?: boolean;
     message?: string;
 }
 
