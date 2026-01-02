@@ -5,7 +5,8 @@ export const defaultSettings: SmartLogSettings = {
     consoleLoggingEnabled: true,
     consoleLevelLength: 10,
     consoleNameLength: 15,
-    consoleDateTimeEnabled: true
+    consoleDateTimeEnabled: true,
+    dataLoggingEnabled: true
 };
 
 export const defaultLogLevelDebugName: string = 'debug';

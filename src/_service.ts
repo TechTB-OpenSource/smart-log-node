@@ -24,6 +24,7 @@ function createSmartLogInstance() {
         settings.consoleDateTimeEnabled = defaultSettings.consoleDateTimeEnabled;
         settings.consoleLevelLength = defaultSettings.consoleLevelLength;
         settings.consoleNameLength = defaultSettings.consoleNameLength;
+        settings.dataLoggingEnabled = defaultSettings.dataLoggingEnabled;
     }
 
     function setSettings(newSettings: SmartLogSettingsInput): void {
@@ -45,6 +46,10 @@ function createSmartLogInstance() {
 
         if (newSettings.consoleNameLength !== undefined) {
             settings.consoleNameLength = newSettings.consoleNameLength;
+        }
+
+        if (newSettings.dataLoggingEnabled !== undefined) {
+            settings.dataLoggingEnabled = newSettings.dataLoggingEnabled;
         }
     }
 
@@ -91,8 +96,9 @@ function createSmartLogInstance() {
     function smartLog<T extends object>(input: SmartLogInput<T>): void {
         const level: string = input.level || '';
         const definitionName: string = input.definitionName || '';
-        const consoleEnabled: boolean = input.consoleEnabled !== undefined ? input.consoleEnabled : settings.consoleLoggingEnabled;
+        const consoleLoggingEnabled: boolean = input.consoleLoggingEnabled !== undefined ? input.consoleLoggingEnabled : settings.consoleLoggingEnabled;
         const consoleDateTimeEnabled: boolean = input.consoleDateTimeEnabled !== undefined ? input.consoleDateTimeEnabled : settings.consoleDateTimeEnabled;
+        const dataLoggingEnabled: boolean = input.dataLoggingEnabled !== undefined ? input.dataLoggingEnabled : settings.dataLoggingEnabled;
         const content: T = input.content;
         const displayedContentKeys: string[] | undefined = input.displayedContentKeys;
         let message: string;
@@ -113,7 +119,7 @@ function createSmartLogInstance() {
         } else {
             message = convertToString(content);
         }
-        if (consoleEnabled) {
+        if (consoleLoggingEnabled) {
             consoleLog({
                 level: level,
                 name: consoleLogName,
@@ -121,14 +127,16 @@ function createSmartLogInstance() {
                 message: message
             } satisfies ConsoleLogInput);
         }
-        for (let i = 0; i < allDefinitions.length; i++) {
-            const def = allDefinitions[i];
-            if (def.definitionName === definitionName) {
-                def.insertFunction(input);
-                return;
+        if (dataLoggingEnabled) {
+            for (let i = 0; i < allDefinitions.length; i++) {
+                const def = allDefinitions[i];
+                if (def.definitionName === definitionName) {
+                    def.insertFunction(input);
+                    return;
+                }
             }
+            console.error(`${defaultConsoleColors.red}Smart Log Error: No definition found for definitionName: ${definitionName}${defaultConsoleColors.reset}`);
         }
-        console.error(`${defaultConsoleColors.red}Smart Log Error: No definition found for definitionName: ${definitionName}${defaultConsoleColors.reset}`);
     }
 
 
@@ -139,9 +147,10 @@ function createSmartLogInstance() {
                 return;
             }
             const definitionName: string = input.definitionName || '';
-            const consoleEnabled: boolean = input.consoleEnabled !== undefined ? input.consoleEnabled : settings.consoleLoggingEnabled;
+            const consoleLoggingEnabled: boolean = input.consoleLoggingEnabled !== undefined ? input.consoleLoggingEnabled : settings.consoleLoggingEnabled;
             const consoleDateTimeEnabled: boolean = input.consoleDateTimeEnabled !== undefined ? input.consoleDateTimeEnabled : settings.consoleDateTimeEnabled;
             const content: T = input.content;
+            const dataLoggingEnabled: boolean = input.dataLoggingEnabled !== undefined ? input.dataLoggingEnabled : settings.dataLoggingEnabled;
             const displayedContentKeys: string[] | undefined = input.displayedContentKeys;
             let message: string;
             let consoleLogName: string = '';
@@ -158,7 +167,7 @@ function createSmartLogInstance() {
             } else {
                 message = convertToString(content);
             }
-            if (consoleEnabled) {
+            if (consoleLoggingEnabled) {
                 consoleLog({
                     level: level,
                     name: consoleLogName,
@@ -166,15 +175,16 @@ function createSmartLogInstance() {
                     message: message
                 } satisfies ConsoleLogInput);
             }
-
-            for (let i = 0; i < allDefinitions.length; i++) {
-                const def = allDefinitions[i];
-                if (def.definitionName === definitionName) {
-                    await def.insertFunction(input);
-                    return;
+            if (dataLoggingEnabled) {
+                for (let i = 0; i < allDefinitions.length; i++) {
+                    const def = allDefinitions[i];
+                    if (def.definitionName === definitionName) {
+                        await def.insertFunction(input);
+                        return;
+                    }
                 }
+                throw new Error(`Smart Log Error: No definition found for definitionName: ${definitionName}`);
             }
-            throw new Error(`Smart Log Error: No definition found for definitionName: ${definitionName}`);
         } catch (er) {
             console.error(`${defaultConsoleColors.red}SMART LOG ERROR: ${er}${defaultConsoleColors.reset}`);
         }

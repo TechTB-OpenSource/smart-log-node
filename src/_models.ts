@@ -6,6 +6,7 @@ export interface SmartLogSettings {
     consoleDateTimeEnabled: boolean;
     consoleLevelLength: number;
     consoleNameLength: number;
+    dataLoggingEnabled: boolean;
 }
 
 export interface SmartLogSettingsInput {
@@ -14,6 +15,7 @@ export interface SmartLogSettingsInput {
     consoleDateTimeEnabled?: boolean;
     consoleLevelLength?: number;
     consoleNameLength?: number;
+    dataLoggingEnabled?: boolean;
 }
 
 export interface SmartLogDefinition<T extends object> {
@@ -24,9 +26,10 @@ export interface SmartLogDefinition<T extends object> {
 export interface SmartLogInput<T extends object> {
     definitionName: string;
     level?: string;
-    consoleEnabled?: boolean;
+    consoleLoggingEnabled?: boolean;
     consoleDateTimeEnabled?: boolean;
     consoleName?: string;
+    dataLoggingEnabled?: boolean;
     content: T;
     displayedContentKeys?: string[];
 }
