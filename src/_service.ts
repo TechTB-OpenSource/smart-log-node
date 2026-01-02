@@ -131,7 +131,7 @@ function createSmartLogInstance() {
             for (let i = 0; i < allDefinitions.length; i++) {
                 const def = allDefinitions[i];
                 if (def.definitionName === definitionName) {
-                    def.insertFunction(input);
+                    def.dataLoggingFunction(input);
                     return;
                 }
             }
@@ -179,7 +179,7 @@ function createSmartLogInstance() {
                 for (let i = 0; i < allDefinitions.length; i++) {
                     const def = allDefinitions[i];
                     if (def.definitionName === definitionName) {
-                        await def.insertFunction(input);
+                        await def.dataLoggingFunction(input);
                         return;
                     }
                 }
