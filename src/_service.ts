@@ -1,8 +1,8 @@
-import type { Settings, LogDefinition, LogCommonInput, LogConsoleInput, ColorMap, ConsoleLogDefinition } from './_models.js';
+import type { SmartLogSettings, SmartLogSettingsInput, SmartLogDefinition, SmartLogInput, ConsoleLogInput, ColorMap, ConsoleLogDefinition } from './_models.js';
 import {
     defaultSettings,
     defaultConsoleColors,
-    defaultConsoleDefinitions,
+    defaultConsoleLogDefinitions,
     defaultLogLevels,
     defaultLogLevelDebugName
 } from './_defaults.js';
@@ -11,17 +11,46 @@ import _utils from './_utils.js';
 const { convertToString, formatDateTimeForConsole } = _utils;
 
 function createSmartLogInstance() {
-    const definitions: LogDefinition<any>[] = [];
-    const ConsoleLogDefinitions: ConsoleLogDefinition[] = defaultConsoleDefinitions;
+    const allDefinitions: SmartLogDefinition<any>[] = [];
+    const consoleLogDefinitions: ConsoleLogDefinition[] = defaultConsoleLogDefinitions;
     const logLevels: string[] = defaultLogLevels;
     let logLevelDebugName: string = defaultLogLevelDebugName;
     const consoleColors: ColorMap = defaultConsoleColors;
-    const settings: Settings = defaultSettings;
+    const settings: SmartLogSettings = defaultSettings;
 
-    function setSettings(newSettings: Settings): void {
-        settings.consoleLoggingEnabled = newSettings.consoleLoggingEnabled;
-        settings.consoleDateTimeEnabled = newSettings.consoleDateTimeEnabled;
-        settings.debugLogsEnabled = newSettings.debugLogsEnabled;
+    function resetSettings(): void {
+        settings.debugLogsEnabled = defaultSettings.debugLogsEnabled;
+        settings.consoleLoggingEnabled = defaultSettings.consoleLoggingEnabled;
+        settings.consoleDateTimeEnabled = defaultSettings.consoleDateTimeEnabled;
+        settings.consoleLevelLength = defaultSettings.consoleLevelLength;
+        settings.consoleNameLength = defaultSettings.consoleNameLength;
+        settings.dataLoggingEnabled = defaultSettings.dataLoggingEnabled;
+    }
+
+    function setSettings(newSettings: SmartLogSettingsInput): void {
+        if (newSettings.consoleLoggingEnabled !== undefined) {
+            settings.consoleLoggingEnabled = newSettings.consoleLoggingEnabled;
+        }
+
+        if (newSettings.consoleDateTimeEnabled !== undefined) {
+            settings.consoleDateTimeEnabled = newSettings.consoleDateTimeEnabled;
+        }
+        
+        if (newSettings.debugLogsEnabled !== undefined) {
+            settings.debugLogsEnabled = newSettings.debugLogsEnabled;
+        }
+
+        if (newSettings.consoleLevelLength !== undefined) {
+            settings.consoleLevelLength = newSettings.consoleLevelLength;
+        }
+
+        if (newSettings.consoleNameLength !== undefined) {
+            settings.consoleNameLength = newSettings.consoleNameLength;
+        }
+
+        if (newSettings.dataLoggingEnabled !== undefined) {
+            settings.dataLoggingEnabled = newSettings.dataLoggingEnabled;
+        }
     }
 
     function setLogLevels(levels: string[]): void {
@@ -60,19 +89,28 @@ function createSmartLogInstance() {
         Object.assign(consoleColors, colors);
     }
 
-    function addDefinition<T>(definition: LogDefinition<T>): void {
-        definitions.push(definition);
+    function addDefinition<T extends object>(definition: SmartLogDefinition<T>): void {
+        allDefinitions.push(definition);
     }
 
-    function smartLog<T>(input: LogCommonInput<T>): void {
+    function smartLog<T extends object>(input: SmartLogInput<T>): void {
         const level: string = input.level || '';
-        if (level === logLevelDebugName && !settings.debugLogsEnabled) {
-            return;
-        }
-        const category: string = input.category || '';
+        const definitionName: string = input.definitionName || '';
+        const consoleLoggingEnabled: boolean = input.consoleLoggingEnabled !== undefined ? input.consoleLoggingEnabled : settings.consoleLoggingEnabled;
+        const consoleDateTimeEnabled: boolean = input.consoleDateTimeEnabled !== undefined ? input.consoleDateTimeEnabled : settings.consoleDateTimeEnabled;
+        const dataLoggingEnabled: boolean = input.dataLoggingEnabled !== undefined ? input.dataLoggingEnabled : settings.dataLoggingEnabled;
         const content: T = input.content;
         const displayedContentKeys: string[] | undefined = input.displayedContentKeys;
         let message: string;
+        let consoleLogName: string = '';
+        if (input.consoleName) {
+            consoleLogName = input.consoleName;
+        } else {
+            consoleLogName = definitionName;
+        }
+        if (level === logLevelDebugName && !settings.debugLogsEnabled) {
+            return;
+        }
         if (displayedContentKeys && displayedContentKeys.length > 0) {
             const messageValues = displayedContentKeys.map(key =>
                 String(input.content[key as keyof T] || '')
@@ -81,34 +119,46 @@ function createSmartLogInstance() {
         } else {
             message = convertToString(content);
         }
-        if (settings.consoleLoggingEnabled) {
+        if (consoleLoggingEnabled) {
             consoleLog({
                 level: level,
-                category: category,
+                name: consoleLogName,
+                dateTimeEnabled: consoleDateTimeEnabled,
                 message: message
-            } satisfies LogConsoleInput);
+            } satisfies ConsoleLogInput);
         }
-        for (let i = 0; i < definitions.length; i++) {
-            const def = definitions[i];
-            if (def.category === category) {
-                def.insertFunction(input);
-                return;
+        if (dataLoggingEnabled) {
+            for (let i = 0; i < allDefinitions.length; i++) {
+                const def = allDefinitions[i];
+                if (def.definitionName === definitionName) {
+                    def.dataLoggingFunction(input);
+                    return;
+                }
             }
+            console.error(`${defaultConsoleColors.red}Smart Log Error: No definition found for definitionName: ${definitionName}${defaultConsoleColors.reset}`);
         }
-        console.error(`${defaultConsoleColors.red}Smart Log Error: No definition found for category: ${category}${defaultConsoleColors.reset}`);
     }
 
 
-    async function smartLogAwait<T>(input: LogCommonInput<T>): Promise<void> {
+    async function smartLogAwait<T extends object>(input: SmartLogInput<T>): Promise<void> {
         try {
             const level: string = input.level || '';
             if (level === logLevelDebugName && !settings.debugLogsEnabled) {
                 return;
             }
-            const category: string = input.category || '';
+            const definitionName: string = input.definitionName || '';
+            const consoleLoggingEnabled: boolean = input.consoleLoggingEnabled !== undefined ? input.consoleLoggingEnabled : settings.consoleLoggingEnabled;
+            const consoleDateTimeEnabled: boolean = input.consoleDateTimeEnabled !== undefined ? input.consoleDateTimeEnabled : settings.consoleDateTimeEnabled;
             const content: T = input.content;
+            const dataLoggingEnabled: boolean = input.dataLoggingEnabled !== undefined ? input.dataLoggingEnabled : settings.dataLoggingEnabled;
             const displayedContentKeys: string[] | undefined = input.displayedContentKeys;
             let message: string;
+            let consoleLogName: string = '';
+            if (input.consoleName) {
+                consoleLogName = input.consoleName;
+            } else {
+                consoleLogName = definitionName;
+            }
             if (displayedContentKeys && displayedContentKeys.length > 0) {
                 const messageValues = displayedContentKeys.map(key =>
                     String(input.content[key as keyof T] || '')
@@ -117,66 +167,77 @@ function createSmartLogInstance() {
             } else {
                 message = convertToString(content);
             }
-            if (settings.consoleLoggingEnabled) {
+            if (consoleLoggingEnabled) {
                 consoleLog({
                     level: level,
-                    category: category,
+                    name: consoleLogName,
+                    dateTimeEnabled: consoleDateTimeEnabled,
                     message: message
-                } satisfies LogConsoleInput);
+                } satisfies ConsoleLogInput);
             }
-
-            for (let i = 0; i < definitions.length; i++) {
-                const def = definitions[i];
-                if (def.category === category) {
-                    await def.insertFunction(input);
-                    return;
+            if (dataLoggingEnabled) {
+                for (let i = 0; i < allDefinitions.length; i++) {
+                    const def = allDefinitions[i];
+                    if (def.definitionName === definitionName) {
+                        await def.dataLoggingFunction(input);
+                        return;
+                    }
                 }
+                throw new Error(`Smart Log Error: No definition found for definitionName: ${definitionName}`);
             }
-            throw new Error(`Smart Log Error: No definition found for category: ${category}`);
         } catch (er) {
             console.error(`${defaultConsoleColors.red}SMART LOG ERROR: ${er}${defaultConsoleColors.reset}`);
         }
     }
 
-    function consoleLog(input: LogConsoleInput | string): void {
+    function consoleLog(input: ConsoleLogInput | string): void {
         if (typeof input === 'string') {
             console.log(`${defaultConsoleColors.cyan}${input}${defaultConsoleColors.reset}`);
             return;
         }
 
-        const level = input.level || 'default';
+
+        const level = input.level || '';
         if (level === logLevelDebugName && !settings.debugLogsEnabled) {
             return;
         }
 
+        let dateTimeEnabled: boolean = settings.consoleDateTimeEnabled;
+        if (input.dateTimeEnabled) {
+            dateTimeEnabled = input.dateTimeEnabled;
+        }
         let dateTime: string = '';
-        if (settings.consoleDateTimeEnabled) {
+        if (dateTimeEnabled) {
             dateTime = `${formatDateTimeForConsole()} - `;
         }
-        const levelUpper = level.toUpperCase();
-        const categoryUpper = input.category?.toUpperCase() || '';
-        const message = input.message || '';
-        const adjustedLevel = levelUpper.length > 9
-            ? levelUpper.substring(0, 9) + ' ' + '- '
-            : levelUpper.padEnd(10, ' ') + '- ';
-        const adjustedCategory = categoryUpper.length === 0
-            ? ''
-            : categoryUpper.length > 9
-                ? categoryUpper.substring(0, 9) + ' ' + '- '
-                : categoryUpper.padEnd(10, ' ') + '- ';
 
-        for (let i = 0; i < ConsoleLogDefinitions.length; i++) {
-            const def = ConsoleLogDefinitions[i];
+        const levelUpper = level.toUpperCase();
+        const nameUpper = input.name?.toUpperCase() || '';
+        const message = input.message || '';
+        const adjustedLevel = levelUpper.length === 0
+            ? ''
+            : levelUpper.length > settings.consoleLevelLength!
+                ? levelUpper.substring(0, settings.consoleLevelLength! - 1) + ' ' + '- '
+                : levelUpper.padEnd(settings.consoleLevelLength!, ' ') + '- ';
+        const adjustedCategory = nameUpper.length === 0
+            ? ''
+            : nameUpper.length > settings.consoleNameLength!
+                ? nameUpper.substring(0, settings.consoleNameLength! - 1) + ' ' + '- '
+                : nameUpper.padEnd(settings.consoleNameLength!, ' ') + '- ';
+        const adjustedDateTime = dateTimeEnabled ? dateTime : '';
+        for (let i = 0; i < consoleLogDefinitions.length; i++) {
+            const def = consoleLogDefinitions[i];
             if (def.level === level) {
                 const color = consoleColors[def.color || 'reset'] || consoleColors.reset;
-                console.log(`${color}${adjustedLevel}${adjustedCategory}${dateTime}${def.prefix || ''}${message}${def.suffix || ''}${defaultConsoleColors.reset}`);
+                console.log(`${color}${adjustedDateTime}${adjustedLevel}${adjustedCategory}${def.prefix || ''}${message}${def.suffix || ''}${defaultConsoleColors.reset}`);
                 return;
             }
         }
-        console.log(`${defaultConsoleColors.cyan}${adjustedLevel}${dateTime}${message}${defaultConsoleColors.reset}`);
+        console.log(`${defaultConsoleColors.reset}${adjustedDateTime}${adjustedLevel}${adjustedCategory}${message}`);
     }
 
     return {
+        resetSettings,
         setSettings,
         setLogLevels,
         setLogLevelDebug,

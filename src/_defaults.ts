@@ -1,14 +1,17 @@
-import { ColorMap, ConsoleLogDefinition } from "./_models";
+import { LogLevels, SmartLogSettings, ColorMap, ConsoleLogDefinition } from "./_models";
 
-export const defaultSettings = {
+export const defaultSettings: SmartLogSettings = {
+    debugLogsEnabled: false,
     consoleLoggingEnabled: true,
+    consoleLevelLength: 10,
+    consoleNameLength: 15,
     consoleDateTimeEnabled: true,
-    debugLogsEnabled: false
+    dataLoggingEnabled: true
 };
 
 export const defaultLogLevelDebugName: string = 'debug';
 
-export const defaultLogLevels: string[] = [
+export const defaultLogLevels: LogLevels = [
     'info',
     'success',
     'warn',
@@ -27,7 +30,7 @@ export const defaultConsoleColors: ColorMap = {
     orange: '[38;5;208m'
 };
 
-export const defaultConsoleDefinitions: ConsoleLogDefinition[] = [
+export const defaultConsoleLogDefinitions: ConsoleLogDefinition[] = [
     {
         level: "debug",
         color: 'cyan'
