@@ -91,7 +91,7 @@ logInstance.setSettings({
 ```js
 logInstance.addDefinition({
     definitionName: 'system',
-    dataLoggingFunction: async (logInput) => {
+    dataLogFunction: async (logInput) => {
         /**
          * 
          * Database, file, or other logging logic should be placed here.

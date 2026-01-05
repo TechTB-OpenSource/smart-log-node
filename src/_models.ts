@@ -20,7 +20,7 @@ export interface SmartLogSettingsInput {
 
 export interface SmartLogDefinition<T extends object> {
     definitionName: string;
-    dataLoggingFunction: (input: SmartLogInput<T>) => Promise<void>;
+    dataLogFunction: (input: SmartLogInput<T>) => Promise<void>;
 }
 
 export interface SmartLogInput<T extends object> {
