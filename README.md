@@ -1,6 +1,6 @@
 # smart-log-node
 A simple logging utility that makes simultaneous console and database logging easy.
-***Smart log was build with TypeScript but is compatible with both TypeScript and vanilla JavaScript projects.***
+***Smart log was built with TypeScript but is compatible with both TypeScript and vanilla JavaScript projects.***
 ***This README file is a first draft. Additional documentation will be coming in the future***
 
 ***Last Updated 01/05/2025***
