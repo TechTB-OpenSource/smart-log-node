@@ -89,6 +89,10 @@ function createSmartLogInstance() {
         Object.assign(consoleColors, colors);
     }
 
+    function getConsoleColors(): ColorMap {
+        return { ...consoleColors };
+    }
+
     function addDefinition<T extends object>(definition: SmartLogDefinition<T>): void {
         allDefinitions.push(definition);
     }
@@ -242,6 +246,7 @@ function createSmartLogInstance() {
         setLogLevels,
         setLogLevelDebug,
         setConsoleColors,
+        getConsoleColors,
         addDefinition,
         smartLog,
         smartLogAwait,
