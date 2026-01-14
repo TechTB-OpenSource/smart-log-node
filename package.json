@@ -40,7 +40,7 @@
   "homepage": "https://github.com/TechTB-OpenSource/smart-log-node#readme",
   "devDependencies": {
     "typescript": "^5.9.3",
-    "rimraf": "^6.0.1"
+    "rimraf": "^6.1.2"
   },
   "engines": {
     "node": ">=14.0.0"
