@@ -1,30 +1,26 @@
 import type { SmartLogSettings, SmartLogSettingsInput, SmartLogDefinition, SmartLogInput, ConsoleLogInput, ColorMap, ConsoleLogDefinition } from './_models.js';
-import {
-    defaultSettings,
-    defaultConsoleColors,
-    defaultConsoleLogDefinitions,
-    defaultLogLevels,
-    defaultLogLevelDebugName
-} from './_defaults.js';
+import _defaults from './_defaults.js';
 import _utils from './_utils.js';
 
+const {
+    defaultSettings,
+    defaultLogLevelDebugName,
+    defaultLogLevels,
+    defaultConsoleColors,
+    defaultConsoleLogDefinitions
+} = _defaults;
 const { convertToString, formatDateTimeForConsole } = _utils;
 
 function createSmartLogInstance() {
     const allDefinitions: SmartLogDefinition<any>[] = [];
-    const consoleLogDefinitions: ConsoleLogDefinition[] = defaultConsoleLogDefinitions;
-    const logLevels: string[] = defaultLogLevels;
+    const consoleLogDefinitions: ConsoleLogDefinition[] = defaultConsoleLogDefinitions.map(def => ({ ...def }));
+    const logLevels: string[] = [...defaultLogLevels];
     let logLevelDebugName: string = defaultLogLevelDebugName;
-    const consoleColors: ColorMap = defaultConsoleColors;
-    const settings: SmartLogSettings = defaultSettings;
+    const consoleColors: ColorMap = { ...defaultConsoleColors };
+    const settings: SmartLogSettings = { ...defaultSettings };
 
     function resetSettings(): void {
-        settings.debugLogsEnabled = defaultSettings.debugLogsEnabled;
-        settings.consoleLoggingEnabled = defaultSettings.consoleLoggingEnabled;
-        settings.consoleDateTimeEnabled = defaultSettings.consoleDateTimeEnabled;
-        settings.consoleLevelLength = defaultSettings.consoleLevelLength;
-        settings.consoleNameLength = defaultSettings.consoleNameLength;
-        settings.dataLoggingEnabled = defaultSettings.dataLoggingEnabled;
+        Object.assign(settings, { ...defaultSettings });
     }
 
     function setSettings(newSettings: SmartLogSettingsInput): void {
@@ -94,7 +90,7 @@ function createSmartLogInstance() {
     }
 
     function addDefinition<T extends object>(definition: SmartLogDefinition<T>): void {
-        allDefinitions.push(definition);
+        allDefinitions.push({ ...definition });
     }
 
     function smartLog<T extends object>(input: SmartLogInput<T>): void {
