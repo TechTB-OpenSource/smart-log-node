@@ -1,6 +1,6 @@
 {
   "name": "smart-log-node",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "A simple logging utility that makes simultaneous console and database logging easy.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,7 +18,8 @@
   ],
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && tsc"
+    "build": "npm run clean && tsc",
+    "deploy": "npm run build && npm publish"
   },
   "repository": {
     "type": "git",

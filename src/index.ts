@@ -17,5 +17,9 @@ export type {
     SmartLogDefinition,
     SmartLogInput,
     ConsoleLogInput,
-    ConsoleLogDefinition
+    ConsoleLogDefinition,
+    ColorMap
 } from './_models.js';
+
+// Export the return type for createSmartLogInstance
+export type SmartLogInstance = ReturnType<typeof createSmartLogInstance>;
